@@ -10,15 +10,16 @@ namespace Nicolive {
 
 NicoliveCommentReceiver::NicoliveCommentReceiver(QObject *parent)
 	: QObject(parent),
-	  m_webSocket(new QWebSocket(QString(), QWebSocketProtocol::VersionLatest, this)),
+	  m_webSocket(new SimpleWebSocketClient(this)),
 	  m_keepSeatTimer(new QTimer(this)),
 	  m_ndgrHttp(new QNetworkAccessManager(this)),
 	  m_segmentPollTimer(new QTimer(this))
 {
-	connect(m_webSocket, &QWebSocket::connected, this, &NicoliveCommentReceiver::onWsConnected);
-	connect(m_webSocket, &QWebSocket::disconnected, this, &NicoliveCommentReceiver::onWsDisconnected);
-	connect(m_webSocket, &QWebSocket::textMessageReceived, this, &NicoliveCommentReceiver::onWsTextMessageReceived);
-	connect(m_webSocket, &QWebSocket::errorOccurred, this, &NicoliveCommentReceiver::onWsError);
+	connect(m_webSocket, &SimpleWebSocketClient::connected, this, &NicoliveCommentReceiver::onWsConnected);
+	connect(m_webSocket, &SimpleWebSocketClient::disconnected, this, &NicoliveCommentReceiver::onWsDisconnected);
+	connect(m_webSocket, &SimpleWebSocketClient::textMessageReceived, this,
+		&NicoliveCommentReceiver::onWsTextMessageReceived);
+	connect(m_webSocket, &SimpleWebSocketClient::errorOccurred, this, &NicoliveCommentReceiver::onWsError);
 
 	connect(m_keepSeatTimer, &QTimer::timeout, this, &NicoliveCommentReceiver::sendKeepSeat);
 
@@ -71,9 +72,7 @@ void NicoliveCommentReceiver::stop()
 void NicoliveCommentReceiver::connectWebSocket(const QString &url)
 {
 	qInfo() << "[N-Air OBS] Connecting WebSocket:" << url;
-	QNetworkRequest request{QUrl(url)};
-	request.setRawHeader("User-Agent", "N-Air-OBS/1.0");
-	m_webSocket->open(request);
+	m_webSocket->open(QUrl(url));
 }
 
 void NicoliveCommentReceiver::onWsConnected()

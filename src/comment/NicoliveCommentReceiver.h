@@ -4,7 +4,7 @@
 #include <QString>
 #include <QSet>
 #include <QTimer>
-#include <QWebSocket>
+#include "SimpleWebSocketClient.h"
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include "../common/NicoliveData.h"
@@ -49,7 +49,7 @@ private:
 	QString m_viewUrl;
 
 	bool m_isConnected = false;
-	QWebSocket *m_webSocket = nullptr;
+	SimpleWebSocketClient *m_webSocket = nullptr;
 	QTimer *m_keepSeatTimer = nullptr;
 
 	QNetworkAccessManager *m_ndgrHttp = nullptr;
